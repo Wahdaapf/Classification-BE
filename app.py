@@ -7,8 +7,8 @@ from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 
 # Create flask app
-flask_app = Flask(__name__)
-CORS(flask_app)
+app = Flask(__name__)
+CORS(app)
 
 print("flask vers", flask.__version__) 
 
@@ -20,7 +20,11 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
 sentiment_analysis = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
-@flask_app.route("/iris", methods=["POST"])
+@app.route("/")
+def root():
+    return jsonify({"message": "flask worked correctly!"})
+
+@app.route("/iris", methods=["POST"])
 def iris():
     # Get new data from requests
     new_data = request.get_json()
@@ -33,7 +37,7 @@ def iris():
 
     return jsonify({'species': prediction[0]})
 
-@flask_app.route('/sentence', methods=['POST'])
+@app.route('/sentence', methods=['POST'])
 def sentence():
     data = request.json
     sentence = data.get('sentence')
@@ -47,4 +51,4 @@ def sentence():
     })
 
 if __name__ == "__main__":
-    flask_app.run(debug=True)
+    app.run(debug=True)
